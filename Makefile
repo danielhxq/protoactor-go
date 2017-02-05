@@ -1,12 +1,14 @@
 .PHONY: all test
 
-PKGS_TO_CHECK=$(shell go list ./... | grep -v "/vendor/")
+PACKAGES_TO_BUILD=$(shell go list ./... | grep -v "/vendor/")
+PACKAGES_TO_TEST := $(shell go list ./... | grep -v "/examples/"| grep -v "/vendor/")
+PROJECT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 all: build
 
 
 build: protogen
-	go build ${PKGS_TO_CHECK}
+	go build ${PACKAGES_TO_BUILD}
 
 # {{{ Protobuf
 
@@ -21,7 +23,7 @@ PROTO_MAKER := protoc --gogoslick_out=Mgoogle/protobuf/any.proto=github.com/gogo
 protogen: $(PROTO_GEN_FILES)
 
 %.pb.go: %.proto
-	cd $(dir $<); $(PROTO_MAKER) --proto_path=. --proto_path=./vendor --proto_path=$(GOPATH)/src ./*.proto
+	cd $(dir $<); $(PROTO_MAKER) --proto_path=. --proto_path=$(PROJECT_DIR)/vendor ./*.proto
 
 # }}} Protobuf end
 
@@ -35,12 +37,10 @@ protoclean:
 
 # {{{ test
 
-PACKAGES := $(shell go list ./... | grep -v "/examples/")
-
 test:
-	go test $(PACKAGES)
+	go test $(PACKAGES_TO_TEST)
 
 test-short:
-	go test -short $(PACKAGES)
+	go test -short $(PACKAGES_TO_TEST)
 
 # }}} test
