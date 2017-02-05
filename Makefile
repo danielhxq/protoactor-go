@@ -21,7 +21,7 @@ PROTO_MAKER := protoc --gogoslick_out=Mgoogle/protobuf/any.proto=github.com/gogo
 protogen: $(PROTO_GEN_FILES)
 
 %.pb.go: %.proto
-	cd $(dir $<); $(PROTO_MAKER) --proto_path=. --proto_path=$(GOPATH)/src ./*.proto
+	cd $(dir $<); $(PROTO_MAKER) --proto_path=. --proto_path=./vendor --proto_path=$(GOPATH)/src ./*.proto
 
 # }}} Protobuf end
 
